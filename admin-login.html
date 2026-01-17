@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <title>Hospital Admin Login</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
   <style>
     body {
       margin: 0;
@@ -63,14 +64,53 @@
 
   <div class="card">
     <h2>Hospital Admin Login</h2>
-    <form method="POST">
-      <input name="email" placeholder="Admin Email" required>
-      <input name="password" type="password" placeholder="Admin Password" required>
-      <button>Login</button>
-      {% if error %}<div class="error">{{error}}</div>{% endif %}
+
+    <form id="loginForm">
+      <input id="email" placeholder="Admin Email" required>
+      <input id="password" type="password" placeholder="Admin Password" required>
+      <button type="submit">Login</button>
+      <div class="error" id="errorBox"></div>
     </form>
   </div>
 
-</body>
+  <script>
+    const API_BASE = "https://cognitive-disorder-backend-6.onrender.com";
 
+    document.getElementById("loginForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+      const errorBox = document.getElementById("errorBox");
+
+      errorBox.innerText = "";
+
+      try {
+        const res = await fetch(`${API_BASE}/admin-login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, password })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          errorBox.innerText = data.error || "Login failed";
+          return;
+        }
+
+        // OPTIONAL: save token/session flag
+        localStorage.setItem("adminLoggedIn", "true");
+
+        // Redirect after login
+        window.location.href = "admin_dashboard.html";
+
+      } catch (err) {
+        errorBox.innerText = "Server not reachable";
+        console.error(err);
+      }
+    });
+  </script>
+
+</body>
 </html>
