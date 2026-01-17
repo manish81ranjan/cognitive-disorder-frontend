@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <title>Hospital Analytics</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="stylesheet" href="/static/admin.css">
+    <link rel="stylesheet" href="admin.css">
 </head>
 <style>
     body {
@@ -133,88 +133,88 @@
 
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+    const API_BASE = "https://YOUR-RENDER-APP.onrender.com";
 
-            fetch("/admin-stats")
-                .then(res => res.json())
-                .then(data => {
+    document.addEventListener("DOMContentLoaded", function () {
 
-                    new Chart(document.getElementById("accChart"), {
-                        type: "line",
-                        data: {
-                            labels: data.map((_, i) => i + 1),
-                            datasets: [{
-                                label: "Model Accuracy (%)",
-                                data: data,
-                                borderColor: "#22d3ee",
-                                backgroundColor: "rgba(34,211,238,0.2)",
-                                borderWidth: 3,
-                                pointRadius: 5,
-                                pointBackgroundColor: "#22d3ee",
-                                tension: 0.4,
-                                fill: true
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            plugins: {
-                                legend: {
-                                    labels: { color: "#22d3ee", font: { size: 14 } }
-                                }
-                            },
-                            scales: {
-                                x: {
-                                    ticks: { color: "#67e8f9" },
-                                    grid: { color: "rgba(34,211,238,0.1)" }
-                                },
-                                y: {
-                                    min: 60,
-                                    max: 100,
-                                    ticks: { color: "#67e8f9" },
-                                    grid: { color: "rgba(34,211,238,0.15)" }
-                                }
-                            }
-                        }
-                    });
-
-                });
-        });
-
-
-        fetch("/admin-distribution")
+        fetch(`${API_BASE}/admin-stats`)
             .then(res => res.json())
-            .then(dist => {
+            .then(data => {
 
-                new Chart(document.getElementById("distChart"), {
-                    type: "doughnut",
+                new Chart(document.getElementById("accChart"), {
+                    type: "line",
                     data: {
-                        labels: Object.keys(dist),
+                        labels: data.map((_, i) => i + 1),
                         datasets: [{
-                            data: Object.values(dist),
-                            backgroundColor: ["#22d3ee", "#0ea5e9", "#38bdf8"]
+                            label: "Model Accuracy (%)",
+                            data: data,
+                            borderColor: "#22d3ee",
+                            backgroundColor: "rgba(34,211,238,0.2)",
+                            borderWidth: 3,
+                            pointRadius: 5,
+                            pointBackgroundColor: "#22d3ee",
+                            tension: 0.4,
+                            fill: true
                         }]
                     },
                     options: {
-                        responsive: false,   // CRITICAL FIX
-                        cutout: "70%",
+                        responsive: true,
                         plugins: {
                             legend: {
-                                labels: { color: "#67e8f9" },
-                                position: "bottom"
+                                labels: { color: "#22d3ee", font: { size: 14 } }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                ticks: { color: "#67e8f9" },
+                                grid: { color: "rgba(34,211,238,0.1)" }
+                            },
+                            y: {
+                                min: 60,
+                                max: 100,
+                                ticks: { color: "#67e8f9" },
+                                grid: { color: "rgba(34,211,238,0.15)" }
                             }
                         }
                     }
                 });
 
+            })
+            .catch(err => console.error("Admin stats error:", err));
+    });
+
+    fetch(`${API_BASE}/admin-distribution`)
+        .then(res => res.json())
+        .then(dist => {
+
+            new Chart(document.getElementById("distChart"), {
+                type: "doughnut",
+                data: {
+                    labels: Object.keys(dist),
+                    datasets: [{
+                        data: Object.values(dist),
+                        backgroundColor: ["#22d3ee", "#0ea5e9", "#38bdf8"]
+                    }]
+                },
+                options: {
+                    responsive: false,
+                    cutout: "70%",
+                    plugins: {
+                        legend: {
+                            labels: { color: "#67e8f9" },
+                            position: "bottom"
+                        }
+                    }
+                }
             });
 
-    </script>
-
-
-
+        })
+        .catch(err => console.error("Distribution error:", err));
+</script>
 
     <a href="/admin-dashboard" class="btn-outline">⬅ Back</a>
 
 </body>
+
 
 </html>
