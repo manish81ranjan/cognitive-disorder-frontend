@@ -1,4 +1,4 @@
-const API = "http://127.0.0.1:5000";
+const API = "https://cognitive-disorder-backend-6.onrender.com";
 
 // LOGIN
 document.getElementById("loginForm").addEventListener("submit", async (e) => {
@@ -34,3 +34,4 @@ document.getElementById("signupForm").addEventListener("submit", async (e) => {
   const data = await res.json();
   alert(data.message);
 });
+
