@@ -1,90 +1,109 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8">
-    <title>DEMNET MRI Result</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>DEMNET MRI Result</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        body {
-            background: radial-gradient(circle at top, #0a1a3a, #020617);
-            color: #e5e7eb;
-            font-family: "Segoe UI", sans-serif;
-        }
+  <style>
+    body {
+      background: radial-gradient(circle at top, #0a1a3a, #020617);
+      color: #e5e7eb;
+      font-family: "Segoe UI", sans-serif;
+    }
 
-        .result-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(14px);
-            border-radius: 20px;
-            padding: 35px;
-            box-shadow: 0 0 40px rgba(0, 150, 255, 0.15);
-        }
+    .result-card {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(14px);
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 0 40px rgba(0, 150, 255, 0.15);
+    }
 
-        .neural-title {
-            color: #7dd3fc;
-            font-weight: 700;
-        }
+    .neural-title {
+      color: #7dd3fc;
+      font-weight: 700;
+    }
 
-        .confidence {
-            color: #22d3ee;
-        }
+    .confidence {
+      color: #22d3ee;
+    }
 
-        .gradcam {
-            border-radius: 14px;
-            border: 2px solid rgba(59, 130, 246, 0.4);
-        }
+    .gradcam {
+      border-radius: 14px;
+      border: 2px solid rgba(59, 130, 246, 0.4);
+      max-width: 320px;
+    }
 
-        .btn-glow {
-            background: linear-gradient(135deg, #2563eb, #22d3ee);
-            border: none;
-            color: #fff;
-            box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
-        }
+    .btn-glow {
+      background: linear-gradient(135deg, #2563eb, #22d3ee);
+      border: none;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
+    }
 
-        .btn-glow:hover {
-            transform: scale(1.05);
-        }
-    </style>
+    .btn-glow:hover {
+      transform: scale(1.05);
+    }
+  </style>
 </head>
 
 <body>
-    <div class="container mt-5">
-        <div class="result-card text-center">
+  <div class="container mt-5">
+    <div class="result-card text-center">
 
-            <h2 class="neural-title">DEMNET MRI Analysis</h2>
-            <p class="text-muted">AI-powered Cognitive Memory Assessment</p>
+      <h2 class="neural-title">DEMNET MRI Analysis</h2>
+      <p class="text-muted">AI-powered Cognitive Memory Assessment</p>
 
-            <hr class="text-secondary">
+      <hr class="text-secondary">
 
-            <h4>Prediction</h4>
-            <h3 class="fw-bold">{{ prediction }}</h3>
+      <h4>Prediction</h4>
+      <h3 class="fw-bold" id="prediction">Loading...</h3>
 
-            <h5 class="mt-3">Confidence</h5>
-            <h4 class="confidence">{{ confidence }}%</h4>
+      <h5 class="mt-3">Confidence</h5>
+      <h4 class="confidence" id="confidence">--%</h4>
 
-            <div class="mt-4">
-                <h5>Grad-CAM Visualization</h5>
-                <img src="{{ gradcam_image }}" class="img-fluid gradcam mt-3">
-            </div>
-            {% if gradcam_image %}
-            <h3>AI Attention Heatmap</h3>
-            <img src="{{ gradcam_image }}" style="width:300px;border-radius:10px;">
-            {% endif %}
+      <div class="mt-4" id="gradcamSection" style="display:none;">
+        <h5>AI Attention Heatmap</h5>
+        <img id="gradcamImage" class="gradcam mt-3">
+      </div>
 
-            <div class="d-flex justify-content-center gap-3 mt-5">
-                <a href="{{ url_for('download_report') }}" class="btn btn-glow btn-lg">
-                    ⬇ Download Report
-                </a>
-                <a href="/" class="btn btn-outline-light btn-lg">
-                    ⬅ HOME
-                </a>
-            </div>
+      <div class="d-flex justify-content-center gap-3 mt-5">
+        <a id="downloadBtn" class="btn btn-glow btn-lg" target="_blank">
+          ⬇ Download Report
+        </a>
+        <a href="index.html" class="btn btn-outline-light btn-lg">
+          ⬅ HOME
+        </a>
+      </div>
 
-        </div>
     </div>
-</body>
+  </div>
 
+  <script>
+    // Load result data from localStorage
+    const result = JSON.parse(localStorage.getItem("mri_result"));
+
+    if (!result) {
+      alert("No result found. Please upload MRI again.");
+      window.location.href = "index.html";
+    }
+
+    document.getElementById("prediction").innerText = result.prediction;
+    document.getElementById("confidence").innerText = result.confidence + "%";
+
+    if (result.gradcam_url) {
+      document.getElementById("gradcamSection").style.display = "block";
+      document.getElementById("gradcamImage").src = result.gradcam_url;
+    }
+
+    // Backend Render URL (CHANGE THIS)
+    const BACKEND = "https://your-backend.onrender.com";
+
+    document.getElementById("downloadBtn").href =
+      BACKEND + "/download-report/" + result.report_id;
+  </script>
+</body>
 </html>
