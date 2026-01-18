@@ -674,19 +674,19 @@
 
   <header class="fixed top-4 left-4 right-4 z-50 flex items-center justify-between gap-4">
 
-    <!-- LOGO -->
-    <a href="#home" class="flex items-center gap-3">
-      <div class="p-2 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 flex items-center gap-3">
-        <div
-          class="w-10 h-10 rounded bg-gradient-to-br from-indigo-500 to-teal-400 flex items-center justify-center shadow-lg">
-          <img src="{{ url_for('static', filename='images/image 1.jpg') }}" class="w-8 h-8">
-        </div>
-        <div>
-          <div class="text-white font-semibold">DEMNET MRI</div>
-          <div class="text-xs text-slate-300">Cognitive Memory Analysis</div>
-        </div>
-      </div>
-    </a>
+   <!-- LOGO -->
+<a href="#home" class="flex items-center gap-3">
+  <div class="p-2 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 flex items-center gap-3">
+    <div class="w-10 h-10 rounded bg-gradient-to-br from-indigo-500 to-teal-400 flex items-center justify-center shadow-lg">
+      <img src="assets/images/image1.jpg" class="w-8 h-8" alt="DEMNET">
+    </div>
+    <div>
+      <div class="text-white font-semibold">DEMNET MRI</div>
+      <div class="text-xs text-slate-300">Cognitive Memory Analysis</div>
+    </div>
+  </div>
+</a>
+
 
     <!-- DESKTOP NAV -->
     <nav class="hidden md:flex gap-3">
@@ -697,21 +697,18 @@
 
       <!-- User Dropdown -->
       <div class="relative group">
-        <button class="px-3 py-2 rounded-md hover:bg-slate-800 transition">
-          <i class="fa-solid fa-user text-cyan-400"></i>
-        </button>
+  <button class="px-3 py-2 rounded-md hover:bg-slate-800 transition">
+    <i class="fa-solid fa-user text-cyan-400"></i>
+  </button>
 
-        <div
-          class="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-700 rounded-lg shadow-lg opacity-0 group-hover:opacity-100 transition pointer-events-none group-hover:pointer-events-auto">
+  <div
+    class="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-700 rounded-lg shadow-lg hidden"
+    id="userMenu">
+    <a href="account.html" class="block px-4 py-2 hover:bg-slate-800">My Account</a>
+    <a href="#" id="logoutBtn" class="block px-4 py-2 hover:bg-slate-800 text-red-400">Logout</a>
+  </div>
+</div>
 
-          {% if session.user_id %}
-          <a href="/auth" class="block px-4 py-2 hover:bg-slate-800 transition">My Account</a>
-          <a href="/logout" class="block px-4 py-2 hover:bg-slate-800 text-red-400 transition">Logout</a>
-          {% else %}
-          <a href="/profile" class="block px-4 py-2 hover:bg-slate-800 transition">Login / Sign Up</a>
-          {% endif %}
-        </div>
-      </div>
     </nav>
 
     <!-- HAMBURGER -->
@@ -814,38 +811,32 @@
             <input type="file" id="mriInput" multiple accept=".png,.jpg,.jpeg">
           </div> -->
 
-          <form action="/predict" method="POST" enctype="multipart/form-data" class="mri-form medical-form">
+          <form id="mriForm" class="mri-form medical-form">
 
-            <div class="medical-group">
-              <input type="text" name="patient_name" placeholder=" " required>
-              <label>Patient Name</label>
-            </div>
+  <div class="medical-group">
+    <input type="text" id="patientName" required>
+    <label>Patient Name</label>
+  </div>
 
-            <div class="medical-group">
-              <input type="text" name="mri_id" placeholder=" " required>
-              <label>MRI ID</label>
-            </div>
+  <div class="medical-group">
+    <input type="text" id="mriId" required>
+    <label>MRI ID</label>
+  </div>
 
-            <div id="scannerBox" class="scanner hidden">
-              <div class="scanner-frame">
-                <div class="scan-line"></div>
-                <p>AI Scanning MRI Brain…</p>
-              </div>
-            </div>
+  <label class="medical-file">
+    <input type="file" id="mriImage" hidden required>
+    <span>📁 Upload MRI Scan</span>
+  </label>
 
+  <button type="submit" class="medical-analyze-btn">
+    🧠 Analyze MRI
+    <small>AI Cognitive Detection</small>
+  </button>
 
-            <label class="medical-file">
-              <input type="file" name="mri_image" hidden required>
-              <span>📁 Upload MRI Scan</span>
-            </label>
+</form>
 
-            <button type="submit" class="medical-analyze-btn">
-              🧠 Analyze MRI
-              <small>AI Cognitive Detection</small>
-            </button>
-          </form>
+<div id="resultBox" class="mt-4 text-xl text-cyan-300"></div>
 
-          <div id="resultBox" class="mt-4 text-xl text-cyan-300"></div>
 
           <!-- <div class="mt-4 glass p-3 rounded-lg">
             <div id="predSummary" class="hidden">
@@ -985,9 +976,12 @@
             <div class="service-item">🏥 Manage Patients & Analytics</div>
           </div>
 
-          <a href="/admin" class="admin-btn mt-5 w-full text-center block">
-            Enter Admin Panel
-          </a>
+          <a href="https://cognitive-disorder-backend-6.onrender.com/admin" 
+   target="_blank"
+   class="admin-btn mt-5 w-full text-center block">
+  Enter Admin Panel
+</a>
+
         </div>
 
       </div>
@@ -1122,6 +1116,7 @@
 
 
   <script>
+const BACKEND_URL = "https://cognitive-disorder-backend-6.onrender.com";
 
     window.onerror = () => true;
 
@@ -1289,49 +1284,55 @@
     }
 
     document.getElementById('analyzeBtn').addEventListener('click', async () => {
-      if (!slices.length) {
-        toast('Load slices first');
-        return;
-      }
+  if (!slices.length) {
+    toast('Load MRI slices first');
+    return;
+  }
 
-      toast('Analyzing MRI using DEMNET model...');
+  toast('Analyzing MRI using DEMNET AI...');
 
-      const fileInput = document.getElementById('mriInput');
-      const file = fileInput.files[0];
+  const fileInput = document.getElementById('mriInput');
+  const file = fileInput.files[0];
 
-      const formData = new FormData();
-      formData.append("file", file);
+  const formData = new FormData();
+  formData.append("image", file);
 
-      // ✅ CALL FLASK BACKEND
-      const res = await fetch("http://127.0.0.1:5000/predict", {
-        method: "POST",
-        body: formData
-      });
+  try {
+    const res = await fetch(`${BACKEND_URL}/predict`, {
+      method: "POST",
+      body: formData
+    });
 
-      const data = await res.json();
+    const data = await res.json();
 
-      document.getElementById('predLabel').innerText = data.label;
+    document.getElementById('predLabel').innerText = data.label;
 
-      const p = data.probs;
+    if (data.probs) {
       document.getElementById('probList').innerText =
-        `ND:${(p[0] * 100).toFixed(1)}% • 
-     VMD:${(p[1] * 100).toFixed(1)}% • 
-     MID:${(p[2] * 100).toFixed(1)}% • 
-     MOD:${(p[3] * 100).toFixed(1)}%`;
+        `ND ${(data.probs[0]*100).toFixed(1)}% • 
+         VMD ${(data.probs[1]*100).toFixed(1)}% • 
+         MID ${(data.probs[2]*100).toFixed(1)}% • 
+         MOD ${(data.probs[3]*100).toFixed(1)}%`;
+    }
 
-      document.getElementById('predSummary').classList.remove('hidden');
-
-      // Grad-CAM image
+    if (data.gradcam) {
       const img = new Image();
+      img.src = "data:image/png;base64," + data.gradcam;
       img.onload = () => {
         gCtx.clearRect(0, 0, gradCanvas.width, gradCanvas.height);
         gCtx.drawImage(img, 0, 0, gradCanvas.width, gradCanvas.height);
         gradCanvas.classList.remove('hidden-el');
       };
-      img.src = "data:image/png;base64," + data.gradcam;
+    }
 
-      toast('Analysis complete');
-    });
+    document.getElementById('predSummary').classList.remove('hidden');
+    toast('Analysis complete');
+  } catch (err) {
+    console.error(err);
+    toast('Prediction failed');
+  }
+});
+
 
 
 
@@ -1486,7 +1487,7 @@
       body.scrollTop = body.scrollHeight;
 
       try {
-        const response = await fetch('/api/chat', {  // ✅ endpoint fixed
+        const response = await fetch(`${BACKEND_URL}/api/chat`, {  // ✅ endpoint fixed
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ message: val })
@@ -1540,7 +1541,7 @@
     --------------------------- */
     (async function fetchMetrics() {
       try {
-        const res = await fetch('/metrics'); if (!res.ok) throw 0;
+        const res = await fetch(`${BACKEND_URL}/metrics`); if (!res.ok) throw 0;
         const d = await res.json();
         document.getElementById('countAcc').innerText = d.acc || '—';
         document.getElementById('countAuc').innerText = d.auc || '—';
@@ -1764,6 +1765,8 @@
     /* ---------------------------
         Footer 3D/Particle Background
     --------------------------- */
+
+    
     const footerCanvas = document.getElementById('footer-bg');
     const footerCtx = footerCanvas.getContext('2d');
 
@@ -1976,7 +1979,7 @@
       let form = new FormData()
       form.append("image", f)
 
-      fetch("http://127.0.0.1:5000/predict", {
+      fetch(`${BACKEND_URL}/predict`, {
         method: "POST",
         body: form
       })
@@ -1998,7 +2001,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    fetch("/dashboard-data")
+    fetch(`${BACKEND_URL}/dashboard-data)
       .then(res => res.json())
       .then(data => {
 
@@ -2042,7 +2045,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    fetch("/training-history").then(r => r.json()).then(hist => {
+    fetch(`${BACKEND_URL}/training-history).then(r => r.json()).then(hist => {
       new Chart(chartLoss, {
         type: 'line',
         data: {
@@ -2089,35 +2092,28 @@
     }
   </script>
   <script>
-    function sendChat() {
-      let input = document.getElementById("chatInput");
-      let val = input.value.trim();
-      if (!val) return;
+    async function sendChat() {
+  const input = document.getElementById('chatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
 
-      let body = document.getElementById("chatBody");
+  input.value = '';
 
-      let u = document.createElement("div");
-      u.className = "text-right text-xs text-teal-300";
-      u.innerText = "You: " + val;
-      body.appendChild(u);
+  try {
+    const res = await fetch(`${BACKEND_URL}/api/chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg })
+    });
 
-      input.value = "";
-      body.scrollTop = body.scrollHeight;
+    const data = await res.json();
+    document.getElementById('chatBody').innerHTML +=
+      `<div class="text-left text-sm text-slate-200">${data.reply}</div>`;
+  } catch {
+    toast("Chatbot offline");
+  }
+}
 
-      fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: val })
-      })
-        .then(r => r.json())
-        .then(d => {
-          let b = document.createElement("div");
-          b.className = "text-left text-sm text-slate-200";
-          b.innerText = d.reply;
-          body.appendChild(b);
-          body.scrollTop = body.scrollHeight;
-        });
-    }
 
     document.getElementById("chatBtn").onclick = () => document.getElementById("chatbot").classList.toggle("hidden");
     document.getElementById("closeChat").onclick = () => document.getElementById("chatbot").classList.add("hidden");
@@ -2128,5 +2124,6 @@
 
 
 </body>
+
 
 </html>
