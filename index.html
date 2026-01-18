@@ -1282,12 +1282,7 @@ if (user) {
         Mock analyze & download
     --------------------------- */
 
-    const analyzeBtn = document.getElementById('analyzeBtn');
-    if (analyzeBtn) {
-      analyzeBtn.addEventListener('click', async () => {
-        // existing code
-      });
-    }
+    
 
     document.getElementById('analyzeBtn').addEventListener('click', async () => {
   if (!slices.length) {
@@ -1346,10 +1341,10 @@ if (user) {
 
     if (downloadBtn) {
       downloadBtn.addEventListener("click", async () => {
-        if (!currentSliceImg) {
-          toast("No image to download");
-          return;
-        }
+        if (!slices.length) {
+  toast("No image to download");
+  return;
+}
 
         const ctx = sliceCanvas.getContext("2d");
 
@@ -1754,7 +1749,7 @@ if (user) {
       // normalize pixel values
       // convert to grayscale tensor
     }
-    fetch("/predict", {
+    fetch(`${BACKEND_URL}/predict`, {
       method: "POST",
       body: formData
     })
@@ -1997,17 +1992,17 @@ if (user) {
 
 
     const form = document.querySelector(".mri-form");
-    const scanner = document.getElementById("scannerBox");
+if (form) {
+  form.addEventListener("submit", () => {
+    scanner.classList.remove("hidden");
+  });
+}
 
-    form.addEventListener("submit", () => {
-      scanner.classList.remove("hidden");
-    });
   </script>
 
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+ 
   <script>
-    fetch(`${BACKEND_URL}/dashboard-data)
+    fetch(`${BACKEND_URL}/dashboard-data`)
       .then(res => res.json())
       .then(data => {
 
@@ -2048,10 +2043,9 @@ if (user) {
       document.getElementById(id).classList.remove("hidden");
     }
   </script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
+  
   <script>
-    fetch(`${BACKEND_URL}/training-history).then(r => r.json()).then(hist => {
+    fetch(`${BACKEND_URL}/training-history`).then(r => r.json()).then(hist => {
       new Chart(chartLoss, {
         type: 'line',
         data: {
@@ -2069,7 +2063,7 @@ if (user) {
       });
     });
 
-    fetch("/dashboard-data").then(r => r.json()).then(d => {
+    fetch(`${BACKEND_URL}/dashboard-data`).then(r => r.json()).then(d => {
       new Chart(chartDist, {
         type: 'doughnut',
         data: {
@@ -2121,16 +2115,17 @@ if (user) {
 }
 
 
-    document.getElementById("chatBtn").onclick = () => document.getElementById("chatbot").classList.toggle("hidden");
-    document.getElementById("closeChat").onclick = () => document.getElementById("chatbot").classList.add("hidden");
-    document.getElementById("sendChat").onclick = sendChat;
-    document.getElementById("chatInput").onkeydown = e => { if (e.key === "Enter") sendChat(); };
+    // document.getElementById("chatBtn").onclick = () => document.getElementById("chatbot").classList.toggle("hidden");
+    // document.getElementById("closeChat").onclick = () => document.getElementById("chatbot").classList.add("hidden");
+    // document.getElementById("sendChat").onclick = sendChat;
+    // document.getElementById("chatInput").onkeydown = e => { if (e.key === "Enter") sendChat(); };
   </script>
-  <script src="/static/js/hamburger.js"></script>
+  <script src="./hamburger.js" defer></script>
 
 
 </body>
 
 
 </html>
+
 
