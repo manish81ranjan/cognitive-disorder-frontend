@@ -24,8 +24,9 @@
   <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script> -->
 
 
-  <script src="auth.js"></script>
-  <script src="upload.js"></script>
+  <script src="auth.js" defer></script>
+<script src="upload.js" defer></script>
+
 
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
@@ -701,12 +702,12 @@
     <i class="fa-solid fa-user text-cyan-400"></i>
   </button>
 
-  <div
-    class="absolute right-0 mt-2 w-44 bg-slate-900 border border-slate-700 rounded-lg shadow-lg hidden"
-    id="userMenu">
-    <a href="account.html" class="block px-4 py-2 hover:bg-slate-800">My Account</a>
-    <a href="#" id="logoutBtn" class="block px-4 py-2 hover:bg-slate-800 text-red-400">Logout</a>
-  </div>
+  <div id="navAuthLinks">
+  <a id="loginLink" href="auth.html">Login / Sign Up</a>
+  <a id="accountLink" href="profile.html" class="hidden">My Account</a>
+  <button id="logoutBtn" class="hidden">Logout</button>
+</div>
+
 </div>
 
     </nav>
@@ -728,12 +729,11 @@
       <button data-target="model">Model</button>
       <button data-target="dashboard">Dashboard</button>
 
-      {% if session.user_id %}
-      <a href="/auth">My Account</a>
-      <a href="/logout" class="text-red-400">Logout</a>
-      {% else %}
-      <a href="/profile">Login / Sign Up</a>
-      {% endif %}
+      <div id="navAuthLinks">
+  <a id="loginLink" href="auth.html">Login / Sign Up</a>
+  <a id="accountLink" href="profile.html" class="hidden">My Account</a>
+  <button href="#" id="logoutBtn" class="hidden">Logout</button>
+</div>
 
       <button id="chatBtnMobile">Chat</button>
     </nav>
@@ -1117,6 +1117,12 @@
 
   <script>
 const BACKEND_URL = "https://cognitive-disorder-backend-6.onrender.com";
+const user = JSON.parse(localStorage.getItem("user"));
+if (user) {
+  document.getElementById("loginLink").classList.add("hidden");
+  document.getElementById("accountLink").classList.remove("hidden");
+  document.getElementById("logoutBtn").classList.remove("hidden");
+}
 
     window.onerror = () => true;
 
@@ -2127,3 +2133,4 @@ const BACKEND_URL = "https://cognitive-disorder-backend-6.onrender.com";
 
 
 </html>
+
