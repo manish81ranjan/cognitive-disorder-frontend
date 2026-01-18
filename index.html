@@ -1992,11 +1992,15 @@ if (user) {
 
 
     const form = document.querySelector(".mri-form");
-if (form) {
-  form.addEventListener("submit", () => {
+const scanner = document.getElementById("scannerBox");
+
+if (form && scanner) {
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();          // prevents page reload
     scanner.classList.remove("hidden");
   });
 }
+
 
   </script>
 
@@ -2127,5 +2131,6 @@ if (form) {
 
 
 </html>
+
 
 
