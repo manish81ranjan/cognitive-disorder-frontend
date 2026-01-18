@@ -1,71 +1,76 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <title>Hospital Admin Reports</title>
-    <link rel="stylesheet" href="/static/admin.css">
+
+    <!-- FIXED CSS PATH -->
+    <link rel="stylesheet" href="admin.css">
+
+    <style>
+        body {
+            background: #020b14;
+            color: #0ff;
+            font-family: Segoe UI;
+            padding: 30px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        .glass-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 0, 0, .4);
+            backdrop-filter: blur(10px);
+        }
+
+        .glass-table th,
+        .glass-table td {
+            padding: 12px;
+            border-bottom: 1px solid #0ff;
+            text-align: center;
+        }
+
+        .btn-glow {
+            background: #00ffee;
+            color: black;
+            padding: 6px 14px;
+            border-radius: 8px;
+            text-decoration: none;
+        }
+
+        .btn-danger {
+            background: #ff0040;
+            color: white;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-outline {
+            border: 1px solid cyan;
+            color: cyan;
+            padding: 10px 18px;
+            border-radius: 10px;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+    </style>
 </head>
-
-<style>
-    body {
-        background: #020b14;
-        color: #0ff;
-        font-family: Segoe UI;
-        padding: 30px
-    }
-
-    .title {
-        text-align: center;
-        font-size: 28px;
-        margin-bottom: 20px
-    }
-
-    .glass-table {
-        width: 100%;
-        border-collapse: collapse;
-        background: rgba(0, 0, 0, .4);
-        backdrop-filter: blur(10px)
-    }
-
-    .glass-table th,
-    .glass-table td {
-        padding: 12px;
-        border-bottom: 1px solid #0ff;
-        text-align: center
-    }
-
-    .btn-glow {
-        background: #00ffee;
-        color: black;
-        padding: 6px 14px;
-        border-radius: 8px;
-        text-decoration: none
-    }
-
-    .btn-danger {
-        background: #ff0040;
-        color: white;
-        padding: 6px 14px;
-        border-radius: 8px;
-        text-decoration: none
-    }
-
-    .btn-outline {
-        border: 1px solid cyan;
-        color: cyan;
-        padding: 10px 18px;
-        border-radius: 10px;
-        text-decoration: none;
-        display: inline-block;
-        margin-top: 20px
-    }
-</style>
 
 <body>
 
-    <h1 class="title">🧠 Hospital MRI Reports</h1>
+<h1 class="title">🧠 Hospital MRI Reports</h1>
 
-    <table class="glass-table">
+<table class="glass-table">
+    <thead>
         <tr>
             <th>ID</th>
             <th>Patient</th>
@@ -74,29 +79,66 @@
             <th>Confidence</th>
             <th>Severity</th>
             <th>Report</th>
-            <th>Action</th>
+            <th>Actions</th>
         </tr>
+    </thead>
+    <tbody id="reportTable">
+        <tr><td colspan="8">Loading reports...</td></tr>
+    </tbody>
+</table>
 
-        {% for r in reports %}
-        <tr>
-            <td>{{r[0]}}</td>
-            <td>{{r[1]}}</td>
-            <td>{{r[2]}}</td>
-            <td>{{r[3]}}</td>
-            <td>{{r[4]}}%</td>
-            <td>{{r[5]}}</td>
-            <td><a class="btn-glow" href="/static/{{r[7]}}" target="_blank">View</a></td>
-            <td><a class="btn-danger" href="/delete-report/{{r[0]}}">Delete</a></td>
-            <td>
-                <a class="btn-glow" href="/admin-download/{{r[7]}}">Download</a>
-            </td>
+<a href="admin_dashboard.html" class="btn-outline">⬅ Back</a>
 
-        </tr>
-        {% endfor %}
-    </table>
+<script>
+    const API_BASE = "https://YOUR-RENDER-APP.onrender.com";
 
-    <a href="/admin-dashboard" class="btn-outline">⬅ Back</a>
+    // 🔐 Protect route
+    if (!localStorage.getItem("adminLoggedIn")) {
+        window.location.href = "login.html";
+    }
+
+    // 📥 Load reports
+    fetch(`${API_BASE}/admin-reports-data`)
+        .then(res => res.json())
+        .then(reports => {
+            const table = document.getElementById("reportTable");
+            table.innerHTML = "";
+
+            reports.forEach(r => {
+                table.innerHTML += `
+                    <tr>
+                        <td>${r.id}</td>
+                        <td>${r.patient}</td>
+                        <td>${r.mri_id}</td>
+                        <td>${r.diagnosis}</td>
+                        <td>${r.confidence}%</td>
+                        <td>${r.severity}</td>
+                        <td>
+                            <a class="btn-glow" href="${API_BASE}/${r.report_file}" target="_blank">View</a>
+                        </td>
+                        <td>
+                            <button class="btn-danger" onclick="deleteReport(${r.id})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        })
+        .catch(() => {
+            document.getElementById("reportTable").innerHTML =
+                `<tr><td colspan="8">Failed to load reports</td></tr>`;
+        });
+
+    // ❌ Delete report
+    function deleteReport(id) {
+        if (!confirm("Delete this report?")) return;
+
+        fetch(`${API_BASE}/admin-delete-report/${id}`, {
+            method: "DELETE"
+        })
+        .then(res => res.json())
+        .then(() => location.reload());
+    }
+</script>
 
 </body>
-
 </html>
