@@ -679,7 +679,7 @@
 <a href="#home" class="flex items-center gap-3">
   <div class="p-2 rounded-lg bg-white/5 backdrop-blur-md border border-white/10 flex items-center gap-3">
     <div class="w-10 h-10 rounded bg-gradient-to-br from-indigo-500 to-teal-400 flex items-center justify-center shadow-lg">
-      <img src="assets/images/image1.jpg" class="w-8 h-8" alt="DEMNET">
+      <img src="image1.jpg" class="w-8 h-8" alt="DEMNET">
     </div>
     <div>
       <div class="text-white font-semibold">DEMNET MRI</div>
@@ -803,8 +803,9 @@
         <div>
           <h2 class="text-2xl font-bold">Upload MRI Series (multi-image)</h2>
           <!-- <input type="file" id="mriInput" multiple accept=".png,.jpg,.jpeg"> -->
-          <p class="mt-2 text-slate-300">Select multiple slices (png/jpg). Use the slice player to animate the volume.
-            For production, wire `/predict` to your backend.</p>
+          <!-- <p class="mt-2 text-slate-300">Select multiple slices (png/jpg). Use the slice player to animate the volume.
+            For production, wire `/predict` to your backend.</p> -->
+          <form class="mri-form" enctype="multipart/form-data">
 
 
           <!-- <div class="mt-4">
@@ -1114,9 +1115,13 @@
 
 
 
+<script>
+  const FRONTEND_ONLY = true;
+</script>
 
   <script>
 const BACKEND_URL = "https://cognitive-disorder-backend-6.onrender.com";
+    
 const user = JSON.parse(localStorage.getItem("user"));
 if (user) {
   document.getElementById("loginLink").classList.add("hidden");
@@ -2131,6 +2136,7 @@ if (form && scanner) {
 
 
 </html>
+
 
 
 
