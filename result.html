@@ -93,23 +93,25 @@
   document.getElementById("prediction").innerText = result.prediction;
   document.getElementById("confidence").innerText = result.confidence + "%";
 
-  const BACKEND = "https://cognitive-disorder-backend-6.onrender.com";
+  const BACKEND = "https://cognitive-disorder-backend-7.onrender.com"; // ✅ FIXED
 
+  // Grad-CAM image
   if (result.gradcam_url) {
     document.getElementById("gradcamSection").style.display = "block";
 
-    if (result.gradcam_url.startsWith("/")) {
-      document.getElementById("gradcamImage").src =
-        BACKEND + result.gradcam_url;
-    } else {
-      document.getElementById("gradcamImage").src = result.gradcam_url;
-    }
+    document.getElementById("gradcamImage").src =
+      result.gradcam_url.startsWith("/")
+        ? BACKEND + result.gradcam_url
+        : result.gradcam_url;
   }
 
+  // Download report
   document.getElementById("downloadBtn").href =
-    BACKEND + "/download-report/" + result.report_id;
+    `${BACKEND}/download-report/${result.report_id}`;
 </script>
+
 
 </body>
 </html>
+
 
