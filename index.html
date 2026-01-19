@@ -825,11 +825,11 @@
   </div>
 
   <label class="medical-file">
-    <input type="file" id="mriImage" hidden required>
+    <input type="file" id="mriInput" name="mri_image" multiple required>
     <span>📁 Upload MRI Scan</span>
   </label>
 
-  <button type="submit" class="medical-analyze-btn">
+  <button type="button" id="analyzeBtn" class="medical-analyze-btn">
     🧠 Analyze MRI
     <small>AI Cognitive Detection</small>
   </button>
@@ -2136,6 +2136,7 @@ if (form && scanner) {
 
 
 </html>
+
 
 
 
