@@ -43,7 +43,7 @@ box-shadow:0 0 30px rgba(0,240,255,.7)}
 </div>
 
 <script>
-const BACKEND = "https://cognitive-disorder-backend-6.onrender.com";
+const BACKEND = "https://cognitive-disorder-backend-7.onrender.com"; // ✅ FIXED
 
 // Load report from localStorage
 const report = JSON.parse(localStorage.getItem("mri_result"));
@@ -59,13 +59,21 @@ document.getElementById("mriId").innerText = report.report_id;
 document.getElementById("diagnosis").innerText = report.prediction;
 document.getElementById("confidence").innerText = report.confidence;
 document.getElementById("severity").innerText = report.severity || "N/A";
-document.getElementById("explanation").innerText = report.explanation || "AI-generated cognitive analysis";
+document.getElementById("explanation").innerText =
+  report.explanation || "AI-generated cognitive analysis";
 
-// Images & download
-document.getElementById("gradcamImg").src = report.gradcam_url;
+// ✅ Grad-CAM image fix
+document.getElementById("gradcamImg").src =
+  report.gradcam_url.startsWith("/")
+    ? BACKEND + report.gradcam_url
+    : report.gradcam_url;
+
+// ✅ Download PDF
 document.getElementById("downloadBtn").href =
   `${BACKEND}/download-report/${report.report_id}`;
 </script>
 
+
 </body>
 </html>
+
