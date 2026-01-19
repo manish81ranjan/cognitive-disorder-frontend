@@ -21,37 +21,40 @@
   </div>
 
   <script>
-    const API_BASE = "https://cognitive-disorder-backend-6.onrender.com";
+  const API_BASE = "https://cognitive-disorder-backend-7.onrender.com";
 
-    fetch(`${API_BASE}/api/mri-history`, {
-      credentials: "include"
+  fetch(`${API_BASE}/mri-history`, {
+    credentials: "include"
+  })
+    .then(res => res.json())
+    .then(data => {
+      const list = document.getElementById("mriList");
+
+      if (!data || data.length === 0) {
+        list.innerHTML = `<li class="text-slate-400">No MRI uploads yet.</li>`;
+        return;
+      }
+
+      list.innerHTML = data.map(u => `
+        <li class="p-3 rounded-xl bg-slate-700/50 flex justify-between items-center">
+          <span>${u.date} • ${u.type}</span>
+          <a href="${API_BASE}/report/${u.id}"
+             class="text-cyan-400 hover:underline"
+             target="_blank">
+            View Report
+          </a>
+        </li>
+      `).join("");
     })
-      .then(res => res.json())
-      .then(data => {
-        const list = document.getElementById("mriList");
+    .catch(err => {
+      console.error(err);
+      document.getElementById("mriList").innerHTML =
+        `<li class="text-red-400">Failed to load history</li>`;
+    });
+</script>
 
-        if (data.status !== "success" || data.uploads.length === 0) {
-          list.innerHTML = `<li class="text-slate-400">No MRI uploads yet.</li>`;
-          return;
-        }
-
-        list.innerHTML = data.uploads.map(u => `
-          <li class="p-3 rounded-xl bg-slate-700/50 flex justify-between items-center">
-            <span>${u.uploaded_at} • ${u.mri_id}</span>
-            <a href="${API_BASE}/report/${u.mri_id}" 
-               class="text-cyan-400 hover:underline" 
-               target="_blank">
-               View Report
-            </a>
-          </li>
-        `).join("");
-      })
-      .catch(() => {
-        document.getElementById("mriList").innerHTML =
-          `<li class="text-red-400">Failed to load history</li>`;
-      });
-  </script>
 
 </body>
 </html>
+
 
