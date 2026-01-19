@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DEMNET • AI Cognitive Disorder Detection</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * { font-family: Poppins; }
+    body {
+      background: radial-gradient(circle at top, #0a1a3a, #020617);
+      color: #e5e7eb;
+    }
+    .glass {
+      background: rgba(255,255,255,.06);
+      backdrop-filter: blur(18px);
+      border-radius: 16px;
+      border: 1px solid rgba(0,255,255,.25);
+      box-shadow: 0 0 40px rgba(0,150,255,.15);
+    }
+    .hidden { display: none !important; }
+    .btn-glow {
+      background: linear-gradient(135deg,#2563eb,#22d3ee);
+      border: none;
+      color: #fff;
+      box-shadow: 0 0 20px rgba(34,211,238,.6);
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- NAVBAR -->
+<nav class="navbar navbar-expand-lg navbar-dark px-4">
+  <a class="navbar-brand fw-bold text-info" href="index.html">DEMNET</a>
+
+  <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse justify-content-end" id="navMenu">
+    <div class="d-flex gap-3">
+      <a class="btn btn-outline-info btn-sm" href="auth.html">Login</a>
+      <a class="btn btn-outline-light btn-sm" href="profile.html">Account</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="container mt-5">
+  <div class="glass p-5 text-center">
+    <h1 class="fw-bold text-info">AI Cognitive Disorder Detection</h1>
+    <p class="text-secondary mt-2">
+      MRI-based dementia analysis using deep learning
+    </p>
+  </div>
+</section>
+
+<!-- MRI FORM -->
+<section class="container mt-5">
+  <div class="glass p-4">
+    <h4 class="text-info mb-3">Upload MRI Scan</h4>
+
+    <form id="mriForm" enctype="multipart/form-data">
+      <div class="mb-3">
+        <label class="form-label">Patient Name</label>
+        <input type="text" id="patientName" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">MRI ID</label>
+        <input type="text" id="mriId" class="form-control" required>
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">MRI Images</label>
+        <input type="file" id="mriInput" class="form-control" accept="image/*" multiple required>
+      </div>
+
+      <button type="button" id="analyzeBtn" class="btn btn-glow w-100">
+        🧠 Analyze MRI
+      </button>
+    </form>
+  </div>
+</section>
+
+<footer class="text-center text-secondary mt-5 mb-4">
+  © 2026 DEMNET • AI Healthcare Platform
+</footer>
+
+<script>
+const BACKEND = "https://cognitive-disorder-backend-6.onrender.com";
+
+document.getElementById("analyzeBtn").onclick = async () => {
+  const files = document.getElementById("mriInput").files;
+  if (!files.length) {
+    alert("Upload MRI images");
+    return;
+  }
+
+  const fd = new FormData();
+  fd.append("patient", document.getElementById("patientName").value);
+  fd.append("mri_id", document.getElementById("mriId").value);
+  [...files].forEach(f => fd.append("images", f));
+
+  try {
+    const res = await fetch(`${BACKEND}/analyze`, {
+      method: "POST",
+      body: fd
+    });
+
+    const data = await res.json();
+    localStorage.setItem("mri_result", JSON.stringify(data));
+    location.href = "result.html";
+
+  } catch (err) {
+    alert("Backend not responding");
+  }
+};
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
