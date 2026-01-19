@@ -87,42 +87,47 @@
 </div>
 
 <script>
-const API = "https://cognitive-disorder-backend-6.onrender.com";
+const API = "https://cognitive-disorder-backend-7.onrender.com";
 
 function switchTab(tab){
-  document.getElementById("indicator").style.left = tab==="login"?"0%":"50%";
-  loginForm.classList.toggle("hidden-slide", tab!=="login");
-  signupForm.classList.toggle("hidden-slide", tab!=="signup");
+  document.getElementById("indicator").style.left = tab === "login" ? "0%" : "50%";
+  loginForm.classList.toggle("hidden-slide", tab !== "login");
+  signupForm.classList.toggle("hidden-slide", tab !== "signup");
 }
 
+// LOGIN
 async function loginUser(e){
   e.preventDefault();
 
   const res = await fetch(`${API}/login`, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
+    method: "POST",
+    credentials: "include", // 🔑 REQUIRED
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
       email: loginEmail.value,
       password: loginPass.value
     })
   });
 
   const data = await res.json();
-  if(data.status==="success"){
+
+  if (data.status === "success") {
     localStorage.setItem("user", JSON.stringify(data.user));
-    location.href = "profile.html";
+    window.location.href = "account.html"; // ✅ correct page
   } else {
-    alert("Invalid credentials");
+    alert(data.message || "Invalid credentials");
   }
 }
 
+// SIGNUP
 async function signupUser(e){
   e.preventDefault();
 
   const res = await fetch(`${API}/signup`, {
-    method:"POST",
-    headers:{ "Content-Type":"application/json" },
-    body:JSON.stringify({
+    method: "POST",
+    credentials: "include", // 🔑 REQUIRED
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
       name: signName.value,
       email: signEmail.value,
       password: signPass.value
@@ -130,8 +135,9 @@ async function signupUser(e){
   });
 
   const data = await res.json();
-  if(data.status==="success"){
-    alert("Account created! Login now.");
+
+  if (data.status === "success") {
+    alert("Account created successfully. Please login.");
     switchTab("login");
   } else {
     alert(data.message || "Signup failed");
@@ -139,5 +145,7 @@ async function signupUser(e){
 }
 </script>
 
+
 </body>
 </html>
+
