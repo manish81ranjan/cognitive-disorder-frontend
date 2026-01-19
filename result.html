@@ -83,27 +83,33 @@
   </div>
 
   <script>
-    // Load result data from localStorage
-    const result = JSON.parse(localStorage.getItem("mri_result"));
+  const result = JSON.parse(localStorage.getItem("mri_result"));
 
-    if (!result) {
-      alert("No result found. Please upload MRI again.");
-      window.location.href = "index.html";
-    }
+  if (!result) {
+    alert("No result found. Please upload MRI again.");
+    window.location.href = "index.html";
+  }
 
-    document.getElementById("prediction").innerText = result.prediction;
-    document.getElementById("confidence").innerText = result.confidence + "%";
+  document.getElementById("prediction").innerText = result.prediction;
+  document.getElementById("confidence").innerText = result.confidence + "%";
 
-    if (result.gradcam_url) {
-      document.getElementById("gradcamSection").style.display = "block";
+  const BACKEND = "https://cognitive-disorder-backend-6.onrender.com";
+
+  if (result.gradcam_url) {
+    document.getElementById("gradcamSection").style.display = "block";
+
+    if (result.gradcam_url.startsWith("/")) {
+      document.getElementById("gradcamImage").src =
+        BACKEND + result.gradcam_url;
+    } else {
       document.getElementById("gradcamImage").src = result.gradcam_url;
     }
+  }
 
-    // Backend Render URL (CHANGE THIS)
-    const BACKEND = "https://your-backend.onrender.com";
+  document.getElementById("downloadBtn").href =
+    BACKEND + "/download-report/" + result.report_id;
+</script>
 
-    document.getElementById("downloadBtn").href =
-      BACKEND + "/download-report/" + result.report_id;
-  </script>
 </body>
 </html>
+
