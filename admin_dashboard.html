@@ -1,146 +1,37 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DEMNET Hospital Admin</title>
-
-    <!-- FIXED CSS PATH -->
-    <link rel="stylesheet" href="admin.css">
-
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-    <style>
-        body {
-            background: #020617;
-            color: #fff;
-            font-family: 'Poppins', sans-serif;
-            padding: 15px;
-            margin: 0;
-        }
-
-        .title {
-            font-size: clamp(24px, 5vw, 32px);
-            color: #0ff;
-            margin-bottom: 25px;
-            text-shadow: 0 0 20px #0ff;
-            text-align: center;
-        }
-
-        .glass {
-            background: rgba(255, 255, 255, .05);
-            padding: 20px;
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(0, 255, 255, .2);
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-
-        @media (min-width: 600px) {
-            .grid { grid-template-columns: repeat(3, 1fr); }
-        }
-
-        .card {
-            padding: 20px;
-            border-radius: 16px;
-            text-align: center;
-            font-size: 18px;
-            background: rgba(255, 255, 255, .05);
-            box-shadow: 0 0 15px rgba(0, 255, 255, .1);
-        }
-
-        .neon-cyan { border: 1px solid #0ff; }
-        .neon-purple { border: 1px solid #a855f7; }
-        .neon-green { border: 1px solid #22c55e; }
-
-        .actions {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            align-items: center;
-            margin-top: 20px;
-        }
-
-        @media (min-width: 600px) {
-            .actions { flex-direction: row; justify-content: center; }
-        }
-
-        .btn-glow, .btn-outline {
-            padding: 12px 28px;
-            border-radius: 14px;
-            font-weight: 600;
-            text-decoration: none;
-            width: 100%;
-            max-width: 250px;
-            text-align: center;
-            transition: 0.3s;
-        }
-
-        .btn-glow {
-            background: #0ff;
-            color: #000;
-        }
-
-        .btn-outline {
-            border: 1px solid #0ff;
-            color: #0ff;
-            background: transparent;
-        }
-    </style>
-</head>
-
-<body>
-
-<h1 class="title">🏥 DEMNET Hospital Control Panel</h1>
-
-<div class="glass">
-
-    <!-- DYNAMIC STATS -->
-    <div class="grid">
-        <div class="card neon-cyan">Total Patients<br><b id="users">--</b></div>
-        <div class="card neon-purple">Total Reports<br><b id="reports">--</b></div>
-        <div class="card neon-green">Best Accuracy<br><b id="accuracy">--%</b></div>
-    </div>
-
-    <div class="actions">
-        <a href="admin_analytics.html" class="btn-glow">AI Analytics</a>
-        <a href="admin_reports.html" class="btn-glow">Patient Reports</a>
-        <button onclick="logout()" class="btn-outline">Logout</button>
-    </div>
-
-</div>
-
 <script>
-    const API_BASE = "https://cognitive-disorder-backend-6.onrender.com";
+  const API_BASE = "https://cognitive-disorder-backend-7.onrender.com";
 
-    // 🔐 Protect page
-    if (!localStorage.getItem("adminLoggedIn")) {
-        window.location.href = "login.html";
-    }
+  // 🔐 Protect page
+  if (!localStorage.getItem("adminLoggedIn")) {
+    window.location.href = "admin-login.html";
+  }
 
-    // 📊 Load dashboard stats
-    fetch(`${API_BASE}/admin-dashboard-stats`)
-        .then(res => res.json())
-        .then(data => {
-            document.getElementById("users").innerText = data.users;
-            document.getElementById("reports").innerText = data.reports;
-            document.getElementById("accuracy").innerText = data.best_accuracy + "%";
-        })
-        .catch(err => console.error("Stats load failed", err));
+  // 📊 Load dashboard stats
+  fetch(`${API_BASE}/admin-dashboard-stats`, {
+    credentials: "include"   // 🔥 REQUIRED
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Unauthorized");
+      return res.json();
+    })
+    .then(data => {
+      document.getElementById("users").innerText = data.users;
+      document.getElementById("reports").innerText = data.reports;
+      document.getElementById("accuracy").innerText = data.best_accuracy + "%";
+    })
+    .catch(err => {
+      console.error("Stats load failed", err);
+      alert("Session expired. Please login again.");
+      window.location.href = "admin-login.html";
+    });
 
-    // 🚪 Logout
-    function logout() {
-        localStorage.removeItem("adminLoggedIn");
-        window.location.href = "login.html";
-    }
+  // 🚪 Logout
+  function logout() {
+    fetch(`${API_BASE}/admin-logout`, {
+      credentials: "include"
+    }).finally(() => {
+      localStorage.removeItem("adminLoggedIn");
+      window.location.href = "admin-login.html";
+    });
+  }
 </script>
-
-</body>
-</html>
