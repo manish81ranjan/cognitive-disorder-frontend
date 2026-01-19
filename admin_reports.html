@@ -90,56 +90,83 @@
 <a href="admin_dashboard.html" class="btn-outline">⬅ Back</a>
 
 <script>
-    const API_BASE = "https://cognitive-disorder-backend-6.onrender.com";
+  const API_BASE = "https://cognitive-disorder-backend-7.onrender.com";
 
-    // 🔐 Protect route
-    if (!localStorage.getItem("adminLoggedIn")) {
-        window.location.href = "login.html";
-    }
+  // 🔐 Protect route
+  if (!localStorage.getItem("adminLoggedIn")) {
+    window.location.href = "admin-login.html";
+  }
 
-    // 📥 Load reports
-    fetch(`${API_BASE}/admin-reports-data`)
-        .then(res => res.json())
-        .then(reports => {
-            const table = document.getElementById("reportTable");
-            table.innerHTML = "";
+  // 📥 Load reports
+  fetch(`${API_BASE}/admin-reports-data`, {
+    credentials: "include"   // 🔥 REQUIRED
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Unauthorized");
+      return res.json();
+    })
+    .then(reports => {
+      const table = document.getElementById("reportTable");
+      table.innerHTML = "";
 
-            reports.forEach(r => {
-                table.innerHTML += `
-                    <tr>
-                        <td>${r.id}</td>
-                        <td>${r.patient}</td>
-                        <td>${r.mri_id}</td>
-                        <td>${r.diagnosis}</td>
-                        <td>${r.confidence}%</td>
-                        <td>${r.severity}</td>
-                        <td>
-                            <a class="btn-glow" href="${API_BASE}/${r.report_file}" target="_blank">View</a>
-                        </td>
-                        <td>
-                            <button class="btn-danger" onclick="deleteReport(${r.id})">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
-        })
-        .catch(() => {
-            document.getElementById("reportTable").innerHTML =
-                `<tr><td colspan="8">Failed to load reports</td></tr>`;
-        });
+      if (!reports.length) {
+        table.innerHTML = `<tr><td colspan="8">No reports found</td></tr>`;
+        return;
+      }
 
-    // ❌ Delete report
-    function deleteReport(id) {
-        if (!confirm("Delete this report?")) return;
+      reports.forEach(r => {
+        table.innerHTML += `
+          <tr>
+            <td>${r.id}</td>
+            <td>${r.patient}</td>
+            <td>${r.mri_id}</td>
+            <td>${r.diagnosis}</td>
+            <td>${r.confidence}%</td>
+            <td>${r.severity}</td>
+            <td>
+              <a class="btn-glow"
+                 href="${API_BASE}/download-report/${r.id}"
+                 target="_blank">
+                 View
+              </a>
+            </td>
+            <td>
+              <button class="btn-danger" onclick="deleteReport(${r.id})">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `;
+      });
+    })
+    .catch(err => {
+      console.error(err);
+      document.getElementById("reportTable").innerHTML =
+        `<tr><td colspan="8">Session expired. Please login again.</td></tr>`;
+      setTimeout(() => {
+        window.location.href = "admin-login.html";
+      }, 1500);
+    });
 
-        fetch(`${API_BASE}/admin-delete-report/${id}`, {
-            method: "DELETE"
-        })
-        .then(res => res.json())
-        .then(() => location.reload());
-    }
+  // ❌ Delete report
+  function deleteReport(id) {
+    if (!confirm("Delete this report?")) return;
+
+    fetch(`${API_BASE}/admin-delete-report/${id}`, {
+      method: "DELETE",
+      credentials: "include"  // 🔥 REQUIRED
+    })
+      .then(res => {
+        if (!res.ok) throw new Error("Delete failed");
+        return res.json();
+      })
+      .then(() => location.reload())
+      .catch(err => alert("Delete failed"));
+  }
 </script>
+
 
 </body>
 </html>
+
 
