@@ -58,54 +58,73 @@
 </div>
 
 <script>
-const backend = "https://cognitive-disorder-backend-6.onrender.com";
+const BACKEND = "https://cognitive-disorder-backend-7.onrender.com";
 
-// Load user from localStorage
-const user = JSON.parse(localStorage.getItem("user"));
-
-if (!user) {
+/* 🔐 Check session-based login */
+fetch(`${BACKEND}/profile`, {
+  credentials: "include"
+})
+.then(res => {
+  if (!res.ok) throw new Error("Not logged in");
+  return res.json();
+})
+.then(user => {
+  document.getElementById("userName").innerText = user.name;
+  document.getElementById("userEmail").innerText = user.email;
+  document.getElementById("avatar").innerText = user.name.charAt(0).toUpperCase();
+})
+.catch(() => {
   window.location.href = "auth.html";
-}
+});
 
-// Populate UI
-document.getElementById("userName").innerText = user.name;
-document.getElementById("userEmail").innerText = user.email;
-document.getElementById("avatar").innerText = user.name.charAt(0).toUpperCase();
-
-// Logout
-document.getElementById("logoutBtn").onclick = () => {
-  localStorage.clear();
+/* 🚪 Logout */
+document.getElementById("logoutBtn").onclick = async () => {
+  await fetch(`${BACKEND}/logout`, {
+    credentials: "include"
+  });
   window.location.href = "auth.html";
 };
 
-// Modal handling
-const modal = document.getElementById("modal");
-const modalContent = document.getElementById("modalContent");
-document.getElementById("closeModal").onclick = () => modal.classList.add("hidden");
-
-// Change password
-document.getElementById("changePasswordBtn").onclick = () => {
-  modalContent.innerHTML = `
-    <h2 class="text-xl mb-4">Change Password</h2>
-    <input class="w-full mb-3 p-2 bg-slate-700 rounded" placeholder="New password">
-    <button class="w-full bg-indigo-600 py-2 rounded">Update</button>
-  `;
-  modal.classList.remove("hidden");
-};
-
-// MRI history
+/* 🧠 MRI History */
 document.getElementById("mriHistoryBtn").onclick = async () => {
-  modalContent.innerHTML = "<p>Loading...</p>";
+  const modal = document.getElementById("modal");
+  const modalContent = document.getElementById("modalContent");
+  modalContent.innerHTML = "Loading...";
   modal.classList.remove("hidden");
 
-  const res = await fetch(\`\${backend}/mri-history?user_id=\${user.id}\`);
-  const data = await res.json();
+  try {
+    const res = await fetch(`${BACKEND}/mri-history`, {
+      credentials: "include"
+    });
+    const data = await res.json();
 
-  modalContent.innerHTML = data.map(i =>
-    `<div class="p-2 bg-slate-700 rounded mb-2">${i.date} • ${i.type}</div>`
-  ).join("");
+    if (!data.length) {
+      modalContent.innerHTML = "<p>No MRI uploads found</p>";
+      return;
+    }
+
+    modalContent.innerHTML = data.map(i =>
+      `<div class="p-2 bg-slate-700 rounded mb-2">
+        ${i.patient_name} • ${i.mri_id}
+      </div>`
+    ).join("");
+
+  } catch {
+    modalContent.innerHTML = "Failed to load MRI history";
+  }
 };
+
+/* 🔒 Change password (redirect to page) */
+document.getElementById("changePasswordBtn").onclick = () => {
+  window.location.href = "change_password.html";
+};
+
+/* ❌ Close modal */
+document.getElementById("closeModal").onclick = () =>
+  document.getElementById("modal").classList.add("hidden");
 </script>
+
 
 </body>
 </html>
+
