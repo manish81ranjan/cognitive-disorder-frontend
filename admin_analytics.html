@@ -132,85 +132,101 @@
 
 
 
-    <script>
-    const API_BASE = "https://cognitive-disorder-backend-6.onrender.com";
+   <script>
+  const API_BASE = "https://cognitive-disorder-backend-7.onrender.com";
 
-    document.addEventListener("DOMContentLoaded", function () {
+  // 🔐 Block page if admin not logged in
+  if (!localStorage.getItem("adminLoggedIn")) {
+    window.location.href = "admin-login.html";
+  }
 
-        fetch(`${API_BASE}/admin-stats`)
-            .then(res => res.json())
-            .then(data => {
+  document.addEventListener("DOMContentLoaded", async () => {
+    try {
+      const res = await fetch(`${API_BASE}/admin-stats`, {
+        credentials: "include"   // 🔥 REQUIRED
+      });
 
-                new Chart(document.getElementById("accChart"), {
-                    type: "line",
-                    data: {
-                        labels: data.map((_, i) => i + 1),
-                        datasets: [{
-                            label: "Model Accuracy (%)",
-                            data: data,
-                            borderColor: "#22d3ee",
-                            backgroundColor: "rgba(34,211,238,0.2)",
-                            borderWidth: 3,
-                            pointRadius: 5,
-                            pointBackgroundColor: "#22d3ee",
-                            tension: 0.4,
-                            fill: true
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        plugins: {
-                            legend: {
-                                labels: { color: "#22d3ee", font: { size: 14 } }
-                            }
-                        },
-                        scales: {
-                            x: {
-                                ticks: { color: "#67e8f9" },
-                                grid: { color: "rgba(34,211,238,0.1)" }
-                            },
-                            y: {
-                                min: 60,
-                                max: 100,
-                                ticks: { color: "#67e8f9" },
-                                grid: { color: "rgba(34,211,238,0.15)" }
-                            }
-                        }
-                    }
-                });
+      if (!res.ok) throw new Error("Unauthorized");
 
-            })
-            .catch(err => console.error("Admin stats error:", err));
+      const data = await res.json();
+
+      new Chart(document.getElementById("accChart"), {
+        type: "line",
+        data: {
+          labels: data.map((_, i) => i + 1),
+          datasets: [{
+            label: "Model Accuracy (%)",
+            data: data,
+            borderColor: "#22d3ee",
+            backgroundColor: "rgba(34,211,238,0.2)",
+            borderWidth: 3,
+            pointRadius: 5,
+            pointBackgroundColor: "#22d3ee",
+            tension: 0.4,
+            fill: true
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: {
+              labels: { color: "#22d3ee" }
+            }
+          },
+          scales: {
+            x: {
+              ticks: { color: "#67e8f9" }
+            },
+            y: {
+              min: 60,
+              max: 100,
+              ticks: { color: "#67e8f9" }
+            }
+          }
+        }
+      });
+
+    } catch (err) {
+      console.error("Admin stats error:", err);
+      alert("Session expired. Please login again.");
+      window.location.href = "admin-login.html";
+    }
+  });
+
+  // 📊 Distribution chart
+  fetch(`${API_BASE}/admin-distribution`, {
+    credentials: "include"   // 🔥 REQUIRED
+  })
+    .then(res => {
+      if (!res.ok) throw new Error("Unauthorized");
+      return res.json();
+    })
+    .then(dist => {
+      new Chart(document.getElementById("distChart"), {
+        type: "doughnut",
+        data: {
+          labels: Object.keys(dist),
+          datasets: [{
+            data: Object.values(dist),
+            backgroundColor: ["#22d3ee", "#0ea5e9", "#38bdf8"]
+          }]
+        },
+        options: {
+          cutout: "70%",
+          plugins: {
+            legend: {
+              labels: { color: "#67e8f9" },
+              position: "bottom"
+            }
+          }
+        }
+      });
+    })
+    .catch(err => {
+      console.error("Distribution error:", err);
     });
-
-    fetch(`${API_BASE}/admin-distribution`)
-        .then(res => res.json())
-        .then(dist => {
-
-            new Chart(document.getElementById("distChart"), {
-                type: "doughnut",
-                data: {
-                    labels: Object.keys(dist),
-                    datasets: [{
-                        data: Object.values(dist),
-                        backgroundColor: ["#22d3ee", "#0ea5e9", "#38bdf8"]
-                    }]
-                },
-                options: {
-                    responsive: false,
-                    cutout: "70%",
-                    plugins: {
-                        legend: {
-                            labels: { color: "#67e8f9" },
-                            position: "bottom"
-                        }
-                    }
-                }
-            });
-
-        })
-        .catch(err => console.error("Distribution error:", err));
 </script>
+
 
     <a href="/admin-dashboard" class="btn-outline">⬅ Back</a>
 
@@ -218,4 +234,5 @@
 
 
 </html>
+
 
