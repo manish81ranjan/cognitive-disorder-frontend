@@ -100,14 +100,16 @@ async function loginUser(e){
   e.preventDefault();
 
   const res = await fetch(`${API}/login`, {
-    method: "POST",
-    credentials: "include", // 🔑 REQUIRED
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      email: loginEmail.value,
-      password: loginPass.value
-    })
-  });
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({
+    email: loginEmail.value,
+    password: loginPass.value
+  })
+});
+
 
   const data = await res.json();
 
@@ -148,4 +150,5 @@ async function signupUser(e){
 
 </body>
 </html>
+
 
