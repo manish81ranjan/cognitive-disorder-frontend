@@ -100,29 +100,24 @@ async function loginUser(e){
   e.preventDefault();
 
   const res = await fetch(`${API}/login`, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    email: loginEmail.value,
-    password: loginPass.value
-  })
-});
-
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      email: loginEmail.value,
+      password: loginPass.value
+    })
+  });
 
   const data = await res.json();
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  if (data.status === "success") {
+    // ✅ SAVE USER
+    localStorage.setItem("user", JSON.stringify(data.user));
 
-fetch(`${API}/predict`, {
-  method: "POST",
-  headers: {
-    "X-USER-ID": user.id
-  },
-  body: formData
-});
-
+    // ✅ REDIRECT
+    window.location.href = "account.html";
   } else {
     alert(data.message || "Invalid credentials");
   }
@@ -134,7 +129,6 @@ async function signupUser(e){
 
   const res = await fetch(`${API}/signup`, {
     method: "POST",
-    credentials: "include", // 🔑 REQUIRED
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
       name: signName.value,
@@ -155,8 +149,10 @@ async function signupUser(e){
 </script>
 
 
+
 </body>
 </html>
+
 
 
 
