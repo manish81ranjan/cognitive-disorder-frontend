@@ -113,9 +113,16 @@ async function loginUser(e){
 
   const data = await res.json();
 
-  if (data.status === "success") {
-    localStorage.setItem("user", JSON.stringify(data.user));
-    window.location.href = "account.html"; // ✅ correct page
+  const user = JSON.parse(localStorage.getItem("user"));
+
+fetch(`${API}/predict`, {
+  method: "POST",
+  headers: {
+    "X-USER-ID": user.id
+  },
+  body: formData
+});
+
   } else {
     alert(data.message || "Invalid credentials");
   }
@@ -150,5 +157,6 @@ async function signupUser(e){
 
 </body>
 </html>
+
 
 
